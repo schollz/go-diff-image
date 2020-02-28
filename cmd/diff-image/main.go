@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	diffimage "github.com/murooka/go-diff-image"
+	diffimage "github.com/schollz/go-diff-image"
 )
 
 func mustOpen(filename string) *os.File {
@@ -63,7 +63,12 @@ func main() {
 	img1 := mustLoadImage(args[0])
 	img2 := mustLoadImage(args[1])
 
-	dst := diffimage.DiffImage(img1, img2)
+	dst, deletions, insertions, equals := diffimage.DiffImage(img1, img2)
 
 	mustSaveImage(dst, output)
+
+	fmt.Printf("deletions: %d\n", deletions)
+	fmt.Printf("insertions: %d\n", insertions)
+	fmt.Printf("equals: %d\n", equals)
+
 }
