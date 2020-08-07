@@ -117,7 +117,7 @@ func max(a, b int) int {
 	return b
 }
 
-func DiffImage(img1, img2 image.Image) (diffImg *image.RGBA, deletions int, insertions int, equals int) {
+func DiffImage(img1, img2 image.Image, removeFront ...bool) (diffImg *image.RGBA, deletions int, insertions int, equals int) {
 	sz1 := img1.Bounds().Size()
 	sz2 := img2.Bounds().Size()
 	w := max(sz1.X, sz2.X)
@@ -130,6 +130,28 @@ func DiffImage(img1, img2 image.Image) (diffImg *image.RGBA, deletions int, inse
 	lines2 := make([]string, 0, sz2.Y)
 	for y := 0; y < sz2.Y; y++ {
 		lines2 = append(lines2, encodeLine(img2, y))
+	}
+
+	if len(removeFront) > 0 && removeFront[0] {
+		// remove lines in the beginning that are the same
+		for i, line := range lines1 {
+			if i == 0 {
+				continue
+			}
+			if line != lines1[i-1] {
+				lines1 = lines1[i:]
+				break
+			}
+		}
+		for i, line := range lines2 {
+			if i == 0 {
+				continue
+			}
+			if line != lines2[i-1] {
+				lines2 = lines2[i:]
+				break
+			}
+		}
 	}
 
 	diffs := diff(lines1, lines2)
